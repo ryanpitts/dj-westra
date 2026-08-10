@@ -25,14 +25,17 @@ function parseCsv(text) {
     headers.forEach(function (header, i) {
       show[header.trim()] = values[i] ? values[i].trim() : '';
     });
-    show.dateObj = parseDate(show.date);
+    show.dateObj = parseDate(show.show_date);
     return show;
   });
 }
 
-function parseDate(isoDate) {
-  var parts = isoDate.split('-');
-  return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+function parseDate(dateValue) {
+  var isoParts = dateValue.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoParts) {
+    return new Date(Number(isoParts[1]), Number(isoParts[2]) - 1, Number(isoParts[3]));
+  }
+  return new Date(dateValue);
 }
 
 function formatDate(dateObj, includeWeekday) {
@@ -56,7 +59,7 @@ function renderShows(listId, shows, includeWeekday) {
   var list = document.getElementById(listId);
   shows.forEach(function (show) {
     var li = document.createElement('li');
-    var time = formatTime(show.time);
+    var time = formatTime(show.show_time);
     var dateText = formatDate(show.dateObj, includeWeekday) + (time ? ', ' + time : '');
     li.appendChild(document.createTextNode(dateText + ' at '));
 
@@ -69,7 +72,7 @@ function renderShows(listId, shows, includeWeekday) {
       li.appendChild(document.createTextNode(show.venue));
     }
 
-    if (show.apple_playlist) {
+    if (show.playlist_url) {
       li.appendChild(document.createTextNode(' ~ '));
       var playlistLabelFull = document.createElement('span');
       playlistLabelFull.className = 'playlist-label-full';
@@ -77,7 +80,7 @@ function renderShows(listId, shows, includeWeekday) {
       li.appendChild(playlistLabelFull);
       li.appendChild(document.createTextNode('playlist '));
       var link = document.createElement('a');
-      link.href = show.apple_playlist;
+      link.href = show.playlist_url;
       link.className = 'apple-icon';
       li.appendChild(link);
     }
