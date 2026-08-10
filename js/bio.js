@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
   fetch('data/bio.json')
     .then(function (response) { return response.json(); })
-    .then(function (bio) {
+    .then(function (rows) {
+      var bio = rows[0];
       var h1 = document.querySelector('h1');
       if (h1.textContent !== bio.name) {
         h1.textContent = bio.name;
