@@ -69,7 +69,6 @@ h2 + ul {
   object-fit: cover;
   vertical-align: middle;
   margin-right: 8px;
-  border: 1px solid #ccc;
 }
 
 #recent-shows {

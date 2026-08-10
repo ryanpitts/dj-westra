@@ -67,9 +67,9 @@ function renderShows(listId, shows, includeWeekday, includeImage) {
   shows.forEach(function (show) {
     var li = document.createElement('li');
 
-    if (includeImage && show.show_image) {
+    if (includeImage) {
       var img = document.createElement('img');
-      img.src = squareArtworkUrl(show.show_image);
+      img.src = show.show_image ? squareArtworkUrl(show.show_image) : 'img/show-placeholder.svg';
       img.alt = '';
       img.className = 'show-thumb';
 
