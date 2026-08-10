@@ -47,12 +47,26 @@ function formatDate(dateObj, includeWeekday) {
 }
 
 function formatTime(time) {
-  var match = time.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-  if (!match) return '';
-  var hour = match[1];
-  var minutes = match[2];
-  var meridiem = match[3].toLowerCase();
-  return minutes === '00' ? hour + meridiem : hour + ':' + minutes + meridiem;
+  if (!time) return '';
+  var segments = time.split('-').map(parseSingleTime);
+  if (segments.indexOf(null) !== -1) return '';
+
+  if (segments.length === 2 && segments[0].meridiem === segments[1].meridiem) {
+    return formatTimeParts(segments[0], false) + '-' + formatTimeParts(segments[1], true);
+  }
+
+  return segments.map(function (segment) { return formatTimeParts(segment, true); }).join('-');
+}
+
+function parseSingleTime(time) {
+  var match = time.trim().match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i);
+  if (!match) return null;
+  return { hour: match[1], minutes: match[2], meridiem: match[3].toLowerCase() };
+}
+
+function formatTimeParts(time, includeMeridiem) {
+  var base = !time.minutes || time.minutes === '00' ? time.hour : time.hour + ':' + time.minutes;
+  return includeMeridiem ? base + time.meridiem : base;
 }
 
 function renderShows(listId, shows, includeWeekday) {
