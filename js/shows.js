@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
-  fetch('data/shows.csv')
-    .then(function (response) { return response.text(); })
-    .then(function (text) {
-      var shows = parseCsv(text);
+  fetch('data/shows.json')
+    .then(function (response) { return response.json(); })
+    .then(function (shows) {
+      shows.forEach(function (show) { show.dateObj = parseDate(show.show_date); });
+
       var today = new Date();
       today.setHours(0, 0, 0, 0);
 
@@ -11,24 +12,10 @@ document.addEventListener('DOMContentLoaded', function () {
       var recent = shows.filter(function (show) { return show.dateObj < today; })
         .sort(function (a, b) { return b.dateObj - a.dateObj; });
 
-      renderShows('upcoming-shows', upcoming, true);
-      renderShows('recent-shows', recent, false);
+      renderShows('upcoming-shows', upcoming, true, false);
+      renderShows('recent-shows', recent, false, true);
     });
 });
-
-function parseCsv(text) {
-  var lines = text.trim().split('\n');
-  var headers = lines[0].split(',');
-  return lines.slice(1).map(function (line) {
-    var values = line.split(',');
-    var show = {};
-    headers.forEach(function (header, i) {
-      show[header.trim()] = values[i] ? values[i].trim() : '';
-    });
-    show.dateObj = parseDate(show.show_date);
-    return show;
-  });
-}
 
 function parseDate(dateValue) {
   var isoParts = dateValue.match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -69,36 +56,69 @@ function formatTimeParts(time, includeMeridiem) {
   return includeMeridiem ? base + time.meridiem : base;
 }
 
-function renderShows(listId, shows, includeWeekday) {
+function squareArtworkUrl(url) {
+  var parts = url.split('/');
+  parts[parts.length - 1] = '600x600bb.jpg';
+  return parts.join('/');
+}
+
+function renderShows(listId, shows, includeWeekday, includeImage) {
   var list = document.getElementById(listId);
   shows.forEach(function (show) {
     var li = document.createElement('li');
+
+    if (includeImage && show.show_image) {
+      var img = document.createElement('img');
+      img.src = squareArtworkUrl(show.show_image);
+      img.alt = '';
+      img.className = 'show-thumb';
+
+      if (show.playlist_url) {
+        var thumbLink = document.createElement('a');
+        thumbLink.href = show.playlist_url;
+        thumbLink.appendChild(img);
+        li.appendChild(thumbLink);
+      } else {
+        li.appendChild(img);
+      }
+    }
+
+    var details = document.createElement('span');
+    details.className = 'show-details';
+
+    var meta = document.createElement('span');
+    meta.className = 'show-meta';
     var time = formatTime(show.show_time);
     var dateText = formatDate(show.dateObj, includeWeekday) + (time ? ', ' + time : '');
-    li.appendChild(document.createTextNode(dateText + ' at '));
+    meta.appendChild(document.createTextNode(dateText + ' at '));
 
     if (show.venue_url) {
       var venueLink = document.createElement('a');
       venueLink.href = show.venue_url;
       venueLink.textContent = show.venue;
-      li.appendChild(venueLink);
+      meta.appendChild(venueLink);
     } else {
-      li.appendChild(document.createTextNode(show.venue));
+      meta.appendChild(document.createTextNode(show.venue));
     }
+    details.appendChild(meta);
 
     if (show.playlist_url) {
-      li.appendChild(document.createTextNode(' ~ '));
+      var listen = document.createElement('span');
+      listen.className = 'show-listen';
+      listen.appendChild(document.createTextNode(' ~ '));
       var playlistLabelFull = document.createElement('span');
       playlistLabelFull.className = 'playlist-label-full';
       playlistLabelFull.textContent = 'listen to the ';
-      li.appendChild(playlistLabelFull);
-      li.appendChild(document.createTextNode('playlist '));
+      listen.appendChild(playlistLabelFull);
+      listen.appendChild(document.createTextNode('playlist '));
       var link = document.createElement('a');
       link.href = show.playlist_url;
       link.className = 'apple-icon';
-      li.appendChild(link);
+      listen.appendChild(link);
+      details.appendChild(listen);
     }
 
+    li.appendChild(details);
     list.appendChild(li);
   });
 }

@@ -56,10 +56,53 @@ h2 + ul {
 
 #upcoming-shows, #recent-shows {
   line-height: 1.6;
+  padding-left: 40px;
 }
 
 #upcoming-shows li, #recent-shows li {
   list-style-type: square;
+}
+
+.show-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  vertical-align: middle;
+  margin-right: 8px;
+  border: 1px solid #ccc;
+}
+
+#recent-shows {
+  list-style-type: none;
+}
+
+#recent-shows li {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  list-style-type: none;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+#recent-shows .show-thumb {
+  width: 60px;
+  height: 60px;
+  margin-right: 0;
+  margin-left: -20px;
+  flex-shrink: 0;
+}
+
+#recent-shows .show-details {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+}
+
+#recent-shows .show-meta,
+#recent-shows .show-listen {
+  display: block;
+  line-height: 1.2;
 }
 
 .apple-icon {
