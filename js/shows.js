@@ -12,8 +12,8 @@ document.addEventListener('DOMContentLoaded', function () {
       var recent = shows.filter(function (show) { return show.dateObj < today; })
         .sort(function (a, b) { return b.dateObj - a.dateObj; });
 
-      renderShows('upcoming-shows', upcoming, true, false);
-      renderShows('recent-shows', recent, false, true);
+      renderShows('upcoming-shows', upcoming, true, false, false, '  ·  ');
+      renderShows('recent-shows', recent, false, true, true, ', ');
     });
 });
 
@@ -62,7 +62,7 @@ function squareArtworkUrl(url) {
   return parts.join('/');
 }
 
-function renderShows(listId, shows, includeWeekday, includeImage) {
+function renderShows(listId, shows, includeWeekday, includeImage, hideTimeWithoutPlaylist, timeSeparator) {
   var list = document.getElementById(listId);
   shows.forEach(function (show) {
     var li = document.createElement('li');
@@ -88,8 +88,8 @@ function renderShows(listId, shows, includeWeekday, includeImage) {
 
     var meta = document.createElement('span');
     meta.className = 'show-meta';
-    var time = formatTime(show.show_time);
-    var dateText = formatDate(show.dateObj, includeWeekday) + (time ? ', ' + time : '');
+    var time = (hideTimeWithoutPlaylist && !show.playlist_url) ? '' : formatTime(show.show_time);
+    var dateText = formatDate(show.dateObj, includeWeekday) + (time ? timeSeparator + time : '');
     meta.appendChild(document.createTextNode(dateText + ' at '));
 
     if (show.venue_url) {
