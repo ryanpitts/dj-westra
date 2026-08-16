@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
         h1.textContent = bio.name;
       }
 
-      var mailLink = document.querySelector('#where a');
+      var mailLink = document.querySelector('#contact a');
       var currentEmail = mailLink.href.replace(/^mailto:/, '');
       if (currentEmail !== bio.email) {
         mailLink.href = 'mailto:' + bio.email;
